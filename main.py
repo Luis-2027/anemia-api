@@ -12,8 +12,6 @@ def softmax_v2(x):
 
 app = FastAPI(title="API Detección de Anemia")
 
-# ⚠️ MEJOR: inicializar variable primero
-modelo_nn = None
 
 try:
     modelo_nn = tf.keras.models.load_model(
