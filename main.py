@@ -12,10 +12,12 @@ def softmax_v2(x):
 
 app = FastAPI(title="API Detección de Anemia")
 
+# ⚠️ MEJOR: inicializar variable primero
+modelo_nn = None
 
 try:
     modelo_nn = tf.keras.models.load_model(
-        "modelo_anemia.keras",
+        "modelo_anemia.h5",
         custom_objects={"softmax_v2": softmax_v2}
     )
     print("✅ Modelo cargado exitosamente")
@@ -64,6 +66,3 @@ def predecir(datos: DatosPaciente):
 
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
