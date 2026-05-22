@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 # =========================
-# FIX softmax custom layer
+# FIX custom softmax (solo si tu modelo lo necesita)
 # =========================
 @tf.keras.utils.register_keras_serializable()
 def softmax_v2(x):
@@ -16,23 +16,26 @@ def softmax_v2(x):
 app = FastAPI(title="API Detección de Anemia")
 
 # =========================
-# Load model
+# CARGA DEL MODELO
 # =========================
 modelo_nn = None
 
 try:
     modelo_nn = tf.keras.models.load_model(
         "modelo_anemia.h5",
+        compile=False,  # 🔥 evita muchos errores en Render
         custom_objects={"softmax_v2": softmax_v2}
     )
     print("✅ Modelo cargado exitosamente")
+
 except Exception as e:
-    print(f"❌ Error cargando modelo: {e}")
+    print("❌ ERROR REAL CARGANDO MODELO:")
+    print(repr(e))   # 🔥 clave para ver el error real en logs
     modelo_nn = None
 
 
 # =========================
-# Input schema
+# INPUT SCHEMA
 # =========================
 class DatosPaciente(BaseModel):
     sw: int
@@ -51,16 +54,16 @@ class DatosPaciente(BaseModel):
 
 
 # =========================
-# Predict endpoint
+# PREDICT ENDPOINT
 # =========================
 @app.post("/predict")
 def predecir(datos: DatosPaciente):
 
-    # check model
+    # validar modelo
     if modelo_nn is None:
         return {"error": "Modelo no cargado en el servidor"}
 
-    # input vector (IMPORTANTE float32)
+    # input
     entrada = np.array([[
         datos.sw,
         datos.Sexo,
@@ -77,7 +80,7 @@ def predecir(datos: DatosPaciente):
         datos.Hbc
     ]], dtype=np.float32)
 
-    # prediction
+    # predicción
     prediccion = modelo_nn.predict(entrada)
     id_clase = int(np.argmax(prediccion[0]))
 
