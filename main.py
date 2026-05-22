@@ -21,7 +21,8 @@ try:
     )
     print("✅ Modelo cargado exitosamente")
 except Exception as e:
-    raise Exception(f"Error cargando modelo: {e}")
+    print(f"❌ Error cargando modelo: {e}")
+
 
 
 class DatosPaciente(BaseModel):
@@ -42,11 +43,14 @@ class DatosPaciente(BaseModel):
 
 @app.post("/predict")
 def predecir(datos: DatosPaciente):
+if modelo_nn is None:
+    return {"error": "Modelo no cargado en el servidor"}
     entrada = np.array([[
         datos.sw, datos.Sexo, datos.EdadMeses, datos.Juntos, datos.SIS,
         datos.Qaliwarma, datos.Hemoglobina, datos.Cred, datos.Suplementacion,
         datos.Consejeria, datos.Sesion, datos.AlturaREN, datos.Hbc
     ]])
+
 
     prediccion = modelo_nn.predict(entrada)
     id_clase = int(np.argmax(prediccion[0]))
