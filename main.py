@@ -12,8 +12,7 @@ def softmax_v2(x):
 
 app = FastAPI(title="API Detección de Anemia")
 
-# ⚠️ MEJOR: inicializar variable primero
-modelo_nn = None
+
 
 try:
     modelo_nn = tf.keras.models.load_model(
@@ -22,7 +21,7 @@ try:
     )
     print("✅ Modelo cargado exitosamente")
 except Exception as e:
-    print(f"❌ Error al cargar el modelo: {e}")
+    raise Exception(f"Error cargando modelo: {e}")
 
 
 class DatosPaciente(BaseModel):
