@@ -22,7 +22,7 @@ modelo_nn = None
 
 try:
     modelo_nn = tf.keras.models.load_model(
-        "modelo_anemia.h5",
+        "modelo_anemia_2025_v3.h5",
         compile=False,  # 🔥 evita muchos errores en Render
         custom_objects={"softmax_v2": softmax_v2}
     )
